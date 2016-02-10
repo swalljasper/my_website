@@ -1,79 +1,45 @@
 
-
-function initialize(){ //calls the functions when the page initializes
-	cities();
-	addColumns(cityPop);
+function initialize(){ //calls the function when page loads
+	debugAjax(); //only calls the debugAjax because debugCallback must be called within the debugAjax function
 	addEvents();
-};
+}
 
-var cityPop;
+var response; //declares response as a global variable
 
-function cities(){ //function that creates cities
 
-	cityPop = [ //array that contains cities data (2 demensional)
-		{
-			city: "Tokyo",
-			population: 33200000
-		},
-		{
-			city: "New York",
-			population: 17800000
-		},
-		{
-			city: "Sao Paulo",
-			population: 17700000
-		},
-		{
-			city: "Seoul",
-			population: 17500000
+
+function debugCallback(response){ //sets up debugCallback function taking response (or the data) as a parameter
+
+	console.log("ran debugCallback") //test to see if the function is running
+	
+	$(mydiv).append('GeoJSON data: ' + JSON.stringify(response)); //adds text to the div then uses the stringify method to convert the data into text and put it in the div 
+}; //Note: not called yet
+
+function debugAjax(){ //sets up debugAjax function
+	
+
+	$.ajax("../data/MegaCities.geojson", { //calls the JQueryAjax method that requests the geojson data
+		dataType: "json", //formats the data that is called from the server
+		success: function(response){ //a JQueryAjax method that calls a function if the data return is successful. This is so nothing is trying to load before we have data
+			
+			debugCallback(response); //NOW we call the debugCallback function, while were within the JQueryAjax method
+			console.log(response) //prints the data to the console 
 		}
-	];
+	});
 
-	$("#mydiv").append("<table>"); //creates table within div (created in index.html)
-
-	$("table").append("<tr>"); //creates table rows within table
-
-	$("tr").append("<th>City</th><th>Population</th>"); //creates table header in tr
-
-	for (var i = 0;i < cityPop.length; i++){ //for loop inputs the array cityPop into the tds
-		var rowHtml = "<tr><td>" + cityPop[i].city + "</td><td>" + cityPop[i].population + "</td></tr>";
-		$("table").append(rowHtml);
-	};
+	$(mydiv).append('<br>GeoJSON data:<br>' + JSON.stringify(response)); //attempts to fill the div with the data outside the JQueryAjax method, resulting in "Undefined"
+	
+	console.log(response) //attempts to print the data to the console outside the JQueryAjax method, again undefined
 };
 
+$(mydiv).append('GeoJSON data: ' + JSON.stringify(response)); //again tries to geoJSON data out of method, leaving undefined data
 
-function addColumns(cityPop){ //function that adds columns 
-	console.log("ran addColumns");
-    
-    $('tr').each(function(i){ //establihes were appending the trs, with the jquery each method: runing through each one until its through all
-
-    	if (i == 0){ //basic if else statement
-
-    		$(this).append('<th>City Size</th>'); //if its the first row make it say City Size
-    	} else {
-
-    		var citySize; //declares city size variable locally
-    		
-    		if (cityPop[i-1].population < 17750000){ //if its not the first row and its under X assign value
-    			citySize = 'Large';
-
-    		} else if (cityPop[i-1].population < 20000000){ //if its not the first row and its under X assign value
-    			citySize = 'Very Large';
-
-    		} else {
-    			citySize = 'Very Very Large'; //if its not the first row and its under X assign value
-    		};
-
-    		$(this).append('<td>' + citySize + '</td>'); //append the tds with the values that were assigned
-    	};
-    });
-};
 
 function addEvents(){ //establishes addEvents function
 
 	
 
-	$('table').mouseover (function(i) { //uses jquery mouseover function on the table and establishes a function of i
+	$('mydiv').mouseover (function(i) { //uses jquery mouseover function on the table and establishes a function of i
 		
 		var color = "rgb("; //establishes color variable with setting up the rgb(x,x,x) format
 
@@ -99,10 +65,10 @@ function addEvents(){ //establishes addEvents function
 		alert('Hey, you clicked me!'); //alert message
 	};
 
-	$('table').on('click', clickme); //establishes that this will be done on the table through jquery on method
+	$('mydiv').on('click', clickme); //establishes that this will be done on the table through jquery on method
 };
 
-$(document).ready(initialize); //initializes functions when page is loaded
+ $(document).ready(initialize); //initializes functions when page is loaded
 
 
  
